@@ -51,6 +51,7 @@ GEM
     concurrent-ruby (1.0.1)
     debug_inspector (0.0.2)
     erubis (2.7.0)
+    excon (0.48.0)
     execjs (2.6.0)
     globalid (0.3.6)
       activesupport (>= 4.1.0)
@@ -67,6 +68,9 @@ GEM
       nokogiri (>= 1.5.9)
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
+    mailchimp-api (2.0.6)
+      excon (>= 0.16.0)
+      json (>= 1.7.7)
     mime-types (2.99.1)
     mini_portile2 (2.0.0)
     minitest (5.8.4)
@@ -146,6 +150,7 @@ DEPENDENCIES
   coffee-rails (~> 4.1.0)
   jbuilder (~> 2.0)
   jquery-rails
+  mailchimp-api
   rails (= 4.2.5)
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
