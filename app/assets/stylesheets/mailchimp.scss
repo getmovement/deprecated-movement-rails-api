@@ -10,7 +10,7 @@ $blue: #075DA4;
   width: $width; height: $height;
   background-position: $positionX $positionY;
   background-repeat: $background-repeat;
- 
+
   @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 144dpi) {
     & {
       background-image: image-url($file + '@2x.' + $type);
@@ -18,9 +18,19 @@ $blue: #075DA4;
   }
 }
 
-.subscribe {
-	text-align: center;
+.container{
+	position: absolute;
+	top: 50%;
+	margin-top: -200px;/* half of #content height*/
+	left: 0;
+	width: 100%;
+
+	.subscribe {
+		text-align: center;
+		height: 395px;
+	}
 }
+
 
 .logo {
 	@include background-image-retina('movement-logo', 'png', 400px, 53px);
