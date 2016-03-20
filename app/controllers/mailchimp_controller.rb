@@ -19,7 +19,7 @@ class MailchimpController < ApplicationController
         end
       rescue Mailchimp::ListAlreadySubscribedError
         respond_to do |format|
-          format.json { render :json => { :message => "#{email} is already subscribed to the list" } }
+          format.json { render :json => { :message => "#{email} is already subscribed to the list." } }
         end
       rescue Mailchimp::ListDoesNotExistError
         respond_to do |format|
@@ -28,7 +28,7 @@ class MailchimpController < ApplicationController
       rescue Mailchimp::Error => ex
 				if ex.message
 				  respond_to do |format|
-				    format.json { render :json => { :message => "There is an error. Please enter valid email id." } }
+				    format.json { render :json => { :message => "There is an error. Please check your email and try again." } }
 				  end
 				else
 				  respond_to do |format|
@@ -38,7 +38,7 @@ class MailchimpController < ApplicationController
 	    end
     else
       respond_to do |format|
-        format.json { render :json => { :message => "Email Address Cannot be blank. Please enter valid email id." } }
+        format.json { render :json => { :message => "Please enter a valid email." } }
       end
     end
   end
