@@ -1,0 +1,7 @@
+<h3>Add a New Member</h3>
+<p>Please enter your email address to subscribe to our newsletter.</p>
+<%= form_tag('/mailchimp/subscribe', method: "post", id: "mailchimp", remote: "true") do -%>
+   <%= email_field(:email, :address, {id: "email", placeholder: "email address"}) %>
+   <%= submit_tag("Subscribe") %>
+<% end %>
+<div id="response"></div>
