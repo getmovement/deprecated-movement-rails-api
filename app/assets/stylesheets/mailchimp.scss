@@ -1,3 +1,52 @@
 // Place all the styles related to the mailchimp controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+$blue: #075DA4;
+
+@mixin background-image-retina($file, $type, $width, $height, $positionX: left, $positionY: top, $background-repeat: no-repeat) {
+  background-image: image-url($file + '.' + $type);
+  background-size: $width $height;
+  width: $width; height: $height;
+  background-position: $positionX $positionY;
+  background-repeat: $background-repeat;
+ 
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 144dpi) {
+    & {
+      background-image: image-url($file + '@2x.' + $type);
+    }
+  }
+}
+
+.subscribe {
+	text-align: center;
+}
+
+.logo {
+	@include background-image-retina('movement-logo', 'png', 400px, 53px);
+	text-indent: -99999px;
+	margin: 0 auto;
+}
+
+input[type="email"] {
+	padding: 8px 10px;
+	font-size: 18px;
+}
+
+button, input[type="submit"] {
+	background: $blue;
+	border: none;
+	border-radius: 5px;
+	color: white;
+	padding: 10px 14px;
+	text-transform: uppercase;
+	font-size: 18px;
+}
+
+p {
+	font-size: 24px;
+}
+
+.form {
+	margin-top: 40px;
+}

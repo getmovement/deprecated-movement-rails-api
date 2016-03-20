@@ -1,7 +1,11 @@
-<h3>Add a New Member</h3>
-<p>Please enter your email address to subscribe to our newsletter.</p>
-<%= form_tag('/mailchimp/subscribe', method: "post", id: "mailchimp", remote: "true") do -%>
-   <%= email_field(:email, :address, {id: "email", placeholder: "email address"}) %>
-   <%= submit_tag("Subscribe") %>
-<% end %>
-<div id="response"></div>
+<div class="subscribe">
+	<h1 class="logo">Movement</h1>
+	<div class="form">
+		<p>Want to join the movement?</p>
+		<%= form_tag('/mailchimp/subscribe', method: "post", id: "mailchimp", remote: "true") do -%>
+		   <%= email_field(:email, :address, {id: "email", placeholder: "email address"}) %>
+		   <%= submit_tag("Join") %>
+		<% end %>
+		<div id="response"></div>
+	</div>
+</div>
