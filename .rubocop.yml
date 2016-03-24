@@ -1,0 +1,16 @@
+Documentation:
+  Enabled: false
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+Style/IndentationConsistency:
+  EnforcedStyle: rails
+Style/ConditionalAssignment:
+  EnforcedStyle: assign_inside_condition
+Metrics/LineLength:
+  Max: 100
+Metrics/CyclomaticComplexity:
+  Max: 12
+Metrics/PerceivedComplexity:
+  Max: 12
+Metrics/AbcSize:
+  Max: 20
