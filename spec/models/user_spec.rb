@@ -7,6 +7,8 @@ RSpec.describe User, type: :model do
 
     it { should have_db_column(:updated_at) }
     it { should have_db_column(:created_at) }
+
+    it { should have_db_index(:email).unique }
   end
 
   describe "validations" do

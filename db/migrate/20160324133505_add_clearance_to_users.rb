@@ -6,7 +6,7 @@ class AddClearanceToUsers < ActiveRecord::Migration
       t.string :remember_token, limit: 128
     end
 
-    add_index :users, :email
+    add_index :users, :email, unique: true
     add_index :users, :remember_token
 
     users = select_all("SELECT id FROM users WHERE remember_token IS NULL")
