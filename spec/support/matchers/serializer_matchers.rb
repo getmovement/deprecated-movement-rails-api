@@ -1,10 +1,4 @@
 RSpec::Matchers.define :serialize_object do |object|
-  match do |json|
-    serializer =  @serializer_klass.new(object)
-    serialization = ActiveModelSerializers::Adapter.create(serializer, include: includes)
-    JSON.parse(serialization.to_json) == json
-  end
-
   chain :with do |serializer_klass|
     @serializer_klass = serializer_klass
   end
@@ -13,27 +7,55 @@ RSpec::Matchers.define :serialize_object do |object|
     @includes = Array.wrap(includes)
   end
 
+  # AMS with the JSON_API adapter deep-transforms the resulting has keys
+  # the default transformation is dasherization, but it's also possible to
+  # specify a method, so this chaing gives us an option to to the same when
+  # checking the result
+  chain :with_key_transform do |key_transform_method|
+    @key_transform_method = key_transform_method
+  end
+
+  match do |actual_json|
+    @object = object
+    @actual_json = actual_json
+    @expected_json = serialize(object)
+    expected == actual
+  end
+
   def includes
     @includes ||= []
   end
+
+  def key_transform_method
+    @key_transform_method ||= :dashed
+  end
+
+  def transform_keys(hash)
+    ActiveModelSerializers::KeyTransform.send(key_transform_method, hash)
+  end
+
+  def serialize(object)
+    serializer = @serializer_klass.new(object)
+    serialization = ActiveModelSerializers::Adapter.create(serializer, include: includes)
+    transform_keys(serialization.as_json).with_indifferent_access
+  end
+
+  def expected
+    @expected_json
+  end
+
+  def actual
+    @actual_json
+  end
+
+  def failure_message
+    "expected json to be a result of serializing #{@object.to_s} with #{@serializer_klass}"
+  end
+
+  diffable
 end
 
 RSpec::Matchers.define :serialize_collection do |collection|
-  match do |actual_json|
-    options = {}
-    options = options.merge pagination_options_for collection if is_paginated? collection
-
-    actual_json = cleanup actual_json
-
-    serializer =  ActiveModelSerializers::CollectionSerializer.new collection, serializer: @serializer_klass
-    serialization = ActiveModelSerializers::Adapter.create(serializer, include: includes, meta: meta)
-
-    expected_json = cleanup JSON.parse(serialization.to_json options)
-
-    content_is_ok = arrays_have_same_elements(expected_json["data"], actual_json["data"])
-    content_is_ok and remainder_is_ok(expected_json, actual_json)
-  end
-
   chain :with do |serializer_klass|
     @serializer_klass = serializer_klass
   end
@@ -48,6 +70,41 @@ RSpec::Matchers.define :serialize_collection do |collection|
 
   chain :with_links_to do |host|
     @host = host
+  end
+
+  # AMS with the JSON_API adapter deep-transforms the resulting has keys
+  # the default transformation is dasherization, but it's also possible to
+  # specify a method, so this chaing gives us an option to to the same when
+  # checking the result
+  chain :with_key_transform do |key_transform_method|
+    @key_transform_method = key_transform_method
+  end
+
+  match do |actual_json|
+    @collection = collection
+    @actual_json = cleanup(actual_json)
+    @expected_json = serialize(collection)
+
+    content_is_ok and remainder_is_ok
+  end
+
+  def serialize(collection)
+    options = {}
+    options = options.merge(pagination_options_for collection) if is_paginated?(collection)
+    serializer =  ActiveModelSerializers::CollectionSerializer.new collection, serializer: @serializer_klass
+    serialization = ActiveModelSerializers::Adapter.create(serializer, include: includes, meta: meta)
+
+    expected_json = serialization.as_json(options)
+    expected_json = cleanup(expected_json)
+    transform_keys(expected_json).with_indifferent_access
+  end
+
+  def key_transform_method
+    @key_transform_method ||= :dashed
+  end
+
+  def transform_keys(hash)
+    ActiveModelSerializers::KeyTransform.send(key_transform_method, hash)
   end
 
   def includes
@@ -70,20 +127,20 @@ RSpec::Matchers.define :serialize_collection do |collection|
     @host.present?
   end
 
-  def cleanup json
+  def cleanup(json)
     json = json.with_indifferent_access
     json = json.except(:meta) unless validate_meta?
     json = json.except(:links) unless validate_links?
     json
   end
 
-  def is_paginated? collection
+  def is_paginated?(collection)
     collection.respond_to?(:current_page) &&
     collection.respond_to?(:total_pages) &&
     collection.respond_to?(:size)
   end
 
-  def pagination_options_for collection
+  def pagination_options_for(collection)
     request = double(original_url: host, query_parameters: {})
 
     serialization_context = ActiveModelSerializers::SerializationContext.new(request)
@@ -91,14 +148,33 @@ RSpec::Matchers.define :serialize_collection do |collection|
     { serialization_context: serialization_context }
   end
 
-  def arrays_have_same_elements a, b
+
+  def arrays_have_same_elements(a, b)
     a.to_set == b.to_set
   end
 
-  def remainder_is_ok expected_json, actual_json
-    expected_json.delete(:data)
-    actual_json.delete(:data)
-    expected_json == actual_json
+  def content_is_ok(expected_json, actual_json)
+    arrays_have_same_elements(expected[:data], actual[:data])
   end
 
+  # ensures parts of the json objects other than the :data hash are also identical
+  def remainder_is_ok(expected_json, actual_json)
+    expected.delete(:data)
+    actual.delete(:data)
+    expected == actual
+  end
+
+  def expected
+    @expected_json
+  end
+
+  def actual
+    @actual_json
+  end
+
+  def failure_message
+    "expected json to be a result of serializing #{@collection.to_s} with #{@serializer_klass}"
+  end
+
+  diffable
 end

@@ -5,6 +5,8 @@ Rails.application.routes.draw do
 
   constraints subdomain: "api" do
     get "ping", to: "ping#index"
+
+    patch "users/me", to: "users#update_authenticated_user"
     resources :users, only: [:show, :create]
   end
 end

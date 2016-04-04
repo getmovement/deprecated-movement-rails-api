@@ -37,6 +37,14 @@ describe UserSerializer, type: :serializer do
       it "has an 'email'" do
         expect(subject["email"]).to eq resource.email
       end
+
+      it "has a 'photo_thumb_url'" do
+        expect(subject["photo_thumb_url"]).to eq resource.photo.url(:thumb)
+      end
+
+      it "has a 'photo_large_url'" do
+        expect(subject["photo_large_url"]).to eq resource.photo.url(:large)
+      end
     end
 
     context "relationships" do

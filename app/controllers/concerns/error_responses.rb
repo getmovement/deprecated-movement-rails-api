@@ -18,4 +18,8 @@ module ErrorResponses
     status = error_hash[:errors][0][:status]
     render json: error_hash, status: status
   end
+
+  def doorkeeper_unauthorized_render_options(error: nil)
+    { json: ErrorSerializer.new(error).serialize }
+  end
 end

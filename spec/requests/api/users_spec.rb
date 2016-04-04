@@ -55,4 +55,41 @@ describe "Users API" do
       ])
     end
   end
+
+  context "PATCH /users/me" do
+    let(:user) { create(:user, password: "password") }
+    let(:file) { File.open("#{Rails.root}/spec/sample_data/default-avatar.png", "r") }
+    let(:base64_image) { Base64.encode64(open(file, &:read)) }
+
+    let(:params) do
+      {
+        data: {
+          id: user.id,
+          type: "users",
+          attributes: { base_64_photo_data: base64_image }
+        }
+      }
+    end
+
+    context "when unauthenticated" do
+      it "returns a 401 with a proper error message" do
+        patch "#{host}/users/me", params
+
+        expect(last_response.status).to eq 401
+        expect(json).to be_a_valid_json_api_error.with_id("NOT_AUTHORIZED")
+      end
+    end
+
+    context "when authenticated" do
+      let(:token) { authenticate(email: user.email, password: "password") }
+
+      it "performs the edit" do
+        authenticated_patch "/users/me", params, token
+
+        expect(last_response.status).to eq 200
+        expect(json).to serialize_object(user.reload).with(UserSerializer)
+        expect(UpdateProfilePictureWorker.jobs.size).to eq 1
+      end
+    end
+  end
 end

@@ -6,6 +6,8 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require "spec_helper"
 require "rspec/rails"
 
+require "paperclip/matchers"
+require "sidekiq/testing"
 require "clearance/rspec"
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
@@ -54,4 +56,6 @@ RSpec.configure do |config|
       with.library :rails
     end
   end
+
+  config.include Paperclip::Shoulda::Matchers
 end
