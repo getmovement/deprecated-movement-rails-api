@@ -61,22 +61,29 @@ RSpec::Matchers.define :be_a_valid_json_api_validation_error do
 
   def hash_contains_error_with_message? message
     errors = @hash[:errors]
-    errors.any? { |error| error[:detail] == message }
+    errors.any? do |error_hash|
+      error_message_for(error_hash) == message
+    end
   end
 
   def hash_contains_errors_with_messages? messages
     errors = @hash[:errors]
     messages.each do |message|
-      error = errors.detect do |error|
-        field = error[:source][:pointer].split("/").last
-        detail = error[:detail]
-        "#{field} #{detail}" == message
+      error = errors.detect do |error_hash|
+        error_message_for(error_hash) == message
       end
 
       return false unless error.present?
     end
     return true
   end
+
+  def error_message_for(error_hash)
+    field = error_hash[:source][:pointer].split("/").last
+    detail = error_hash[:detail]
+    "#{field} #{detail}"
+  end
+
 
   match do |hash|
     @hash = hash.with_indifferent_access

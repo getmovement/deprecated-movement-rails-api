@@ -7,6 +7,9 @@ Rails.application.routes.draw do
     get "ping", to: "ping#index"
 
     patch "users/me", to: "users#update_authenticated_user"
-    resources :users, only: [:show, :create]
+    resources :users, only: [:show, :create] do
+      post :forgot_password, on: :collection
+      post :reset_password, on: :collection
+    end
   end
 end

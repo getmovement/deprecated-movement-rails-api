@@ -27,6 +27,7 @@ gem "mailchimp-api", require: "mailchimp"
 
 gem "doorkeeper"
 gem "clearance"
+gem "pundit"
 
 gem "paperclip"
 gem "aws-sdk"

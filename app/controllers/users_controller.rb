@@ -1,12 +1,19 @@
 class UsersController < APIController
+  include UserPasswordManagement
+
   before_action :doorkeeper_authorize!, only: [:update_authenticated_user]
 
   def show
+    user = User.find(params[:id])
+    authorize user
+
     render json: User.find(params[:id])
   end
 
   def create
     user = User.new(create_params)
+
+    authorize user
 
     if user.save
       render json: user, serializer: UserSerializer

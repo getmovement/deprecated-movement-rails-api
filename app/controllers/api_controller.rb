@@ -1,5 +1,6 @@
 class APIController < ActionController::API
   include Clearance::Controller
+  include Pundit
   include ErrorResponses
   include JsonApiParameters
 

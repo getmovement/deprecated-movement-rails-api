@@ -56,6 +56,66 @@ describe "Users API" do
     end
   end
 
+  context "passwords" do
+    let(:user) { create(:user, password: 'test_password') }
+    let(:valid_forgot_params) { { data: { type: "users", attributes: { email: user.email } } } }
+    let(:invalid_forgot_params) { { data: { type: "users", attributes: { email: "a@b.c" } } } }
+
+    let(:valid_reset_params) do
+      {
+        data: {
+          type: "users",
+          attributes: { confirmation_token: user.reload.confirmation_token, password: "new" }
+        }
+      }
+    end
+
+    let(:invalid_reset_params) do
+      {
+        data: {
+          type: "users",
+          attributes: { confirmation_token: "invalid", password: "new" }
+        }
+      }
+    end
+
+    context "POST /users/forgot_password" do
+      it "returns the user when the email is found" do
+        post "#{host}/users/forgot_password", valid_forgot_params
+
+        expect(last_response.status).to eq 200
+        expect(json).to serialize_object(user).with(UserSerializer)
+      end
+
+      it "returns an error when the email is not found" do
+        post "#{host}/users/forgot_password", invalid_forgot_params
+
+        expect(last_response.status).to eq 422
+        expect(json).to be_a_valid_json_api_validation_error.with_message "email doesn't exist in the database"
+      end
+    end
+
+    context "POST /users/reset_password" do
+      it "resets the password when the authentication token is valid" do
+        post "#{host}/users/forgot_password", valid_forgot_params
+        post "#{host}/users/reset_password", valid_reset_params
+
+        expect(last_response.status).to eq 200
+
+        token = authenticate(email: user.email, password: "new")
+        expect(token).to_not be_nil
+      end
+
+      it "doesn't reset the password when the authentication token is not valid" do
+        post "#{host}/users/forgot_password", valid_forgot_params
+        post "#{host}/users/reset_password", invalid_reset_params
+
+        expect(last_response.status).to eq 422
+        expect(json).to be_a_valid_json_api_validation_error.with_message "password could not be reset"
+      end
+    end
+  end
+
   context "PATCH /users/me" do
     let(:user) { create(:user, password: "password") }
     let(:file) { File.open("#{Rails.root}/spec/sample_data/default-avatar.png", "r") }
