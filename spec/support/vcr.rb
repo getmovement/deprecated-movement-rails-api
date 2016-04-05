@@ -14,4 +14,6 @@ VCR.configure do |c|
 
   c.filter_sensitive_data("<BATCH_API_KEY>") { ENV["BATCH_API_KEY"] }
   c.filter_sensitive_data("<BATCH_REST_API_KEY>") { ENV["BATCH_REST_API_KEY"] }
+  c.filter_sensitive_data("<FACEBOOK_APP_ID>") { ENV["FACEBOOK_APP_ID"] }
+  c.filter_sensitive_data("<FACEBOOK_APP_SECRET>") { ENV["FACEBOOK_APP_SECRET"] }
 end

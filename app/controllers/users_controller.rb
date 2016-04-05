@@ -1,5 +1,6 @@
 class UsersController < APIController
   include UserPasswordManagement
+  prepend UserFacebookRegistration
 
   before_action :doorkeeper_authorize!, only: [:update_authenticated_user]
 
@@ -27,6 +28,7 @@ class UsersController < APIController
   end
 
   private
+
     def create_params
       record_attributes.permit(:email, :password, :first_name, :last_name)
     end
@@ -39,14 +41,10 @@ class UsersController < APIController
       user.assign_attributes update_params
 
       if user.save
-        UpdateProfilePictureWorker.perform_async(user.id) if photo_param?
+        UpdateProfilePictureWorker.perform_async(user.id)
         render json: user
       else
         render_validation_errors(user.errors)
       end
-    end
-
-    def photo_param?
-      update_params[:base_64_photo_data].present?
     end
 end

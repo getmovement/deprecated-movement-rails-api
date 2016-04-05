@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
-  use_doorkeeper
+  use_doorkeeper do
+    controllers tokens: "tokens"
+  end
+
   root "mailchimp#index"
   post "mailchimp/subscribe", to: "mailchimp#subscribe"
 

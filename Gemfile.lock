@@ -117,6 +117,10 @@ GEM
     json (1.8.3)
     json_pure (1.8.3)
     jwt (1.5.1)
+    koala (2.2.0)
+      addressable
+      faraday
+      multi_json
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     mail (2.6.3)
@@ -275,6 +279,7 @@ DEPENDENCIES
   hashie
   jbuilder (~> 2.0)
   jquery-rails
+  koala
   mailchimp-api
   oauth2
   paperclip

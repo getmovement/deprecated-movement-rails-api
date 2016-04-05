@@ -10,6 +10,9 @@ RSpec.describe User, type: :model do
 
     it { should have_db_column(:base_64_photo_data).of_type(:string) }
 
+    it { should have_db_column(:facebook_id).of_type(:string) }
+    it { should have_db_column(:facebook_access_token).of_type(:string) }
+
     it { should have_db_column(:updated_at) }
     it { should have_db_column(:created_at) }
 

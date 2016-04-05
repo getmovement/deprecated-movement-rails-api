@@ -53,6 +53,14 @@ describe UserSerializer, type: :serializer do
       it "has a 'photo_large_url'" do
         expect(subject["photo_large_url"]).to eq resource.photo.url(:large)
       end
+
+      it "has a 'facebook_id'" do
+        expect(subject["facebook_id"]).to eq resource.facebook_id
+      end
+
+      it "has a 'facebook_access_token'" do
+        expect(subject["facebook_access_token"]).to eq resource.facebook_access_token
+      end
     end
 
     context "relationships" do

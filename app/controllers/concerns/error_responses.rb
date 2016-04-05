@@ -4,6 +4,7 @@
 # with the JSON API spec (some fields are missing), so we use our own approach
 module ErrorResponses
   extend ActiveSupport::Concern
+  include ActiveSupport::Rescuable
 
   included do
     rescue_from ActiveRecord::RecordNotFound, with: :render_error
