@@ -1,5 +1,8 @@
 class APIController < ActionController::API
   include Clearance::Controller
+  include Pundit
+  include ErrorResponses
+  include JsonApiParameters
 
   before_action :set_default_response_format
 
