@@ -38,6 +38,14 @@ describe UserSerializer, type: :serializer do
         expect(subject["email"]).to eq resource.email
       end
 
+      it "has a 'first_name'" do
+        expect(subject["first_name"]).to eq resource.first_name
+      end
+
+      it "has a 'last_name'" do
+        expect(subject["last_name"]).to eq resource.last_name
+      end
+
       it "has a 'photo_thumb_url'" do
         expect(subject["photo_thumb_url"]).to eq resource.photo.url(:thumb)
       end

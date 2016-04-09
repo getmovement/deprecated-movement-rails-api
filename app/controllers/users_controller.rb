@@ -28,11 +28,11 @@ class UsersController < APIController
 
   private
     def create_params
-      record_attributes.permit(:email, :password)
+      record_attributes.permit(:email, :password, :first_name, :last_name)
     end
 
     def update_params
-      record_attributes.permit(:base_64_photo_data)
+      record_attributes.permit(:first_name, :last_name, :base_64_photo_data)
     end
 
     def update_and_render_result(user)

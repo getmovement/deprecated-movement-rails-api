@@ -1,5 +1,6 @@
 class UserSerializer < ActiveModel::Serializer
-  attributes :email, :photo_thumb_url, :photo_large_url
+  attributes :email, :first_name, :last_name,
+             :photo_thumb_url, :photo_large_url
 
   def photo_thumb_url
     object.photo.url(:thumb)

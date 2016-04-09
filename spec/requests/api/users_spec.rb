@@ -25,6 +25,8 @@ describe "Users API" do
           type: "users",
           attributes: {
             email: "new@example.com",
+            first_name: "Example",
+            last_name: "User",
             password: "password"
           }
         }
@@ -44,6 +46,10 @@ describe "Users API" do
       post "#{host}/users", valid_params
       expect(last_response.status).to eq 200
       expect(json).to serialize_object(User.last).with(UserSerializer)
+
+      # Check the attributes
+      expect(json.data.attributes["first-name"]).to eq "Example"
+      expect(json.data.attributes["last-name"]).to eq "User"
     end
 
     it "fails with a validation error when params are invalid" do
@@ -126,7 +132,11 @@ describe "Users API" do
         data: {
           id: user.id,
           type: "users",
-          attributes: { base_64_photo_data: base64_image }
+          attributes: {
+            first_name: "Changed",
+            last_name: "Changed",
+            base_64_photo_data: base64_image
+          }
         }
       }
     end
@@ -148,6 +158,12 @@ describe "Users API" do
 
         expect(last_response.status).to eq 200
         expect(json).to serialize_object(user.reload).with(UserSerializer)
+
+        # Check the attributes
+        expect(json.data.attributes["first-name"]).to eq "Changed"
+        expect(json.data.attributes["last-name"]).to eq "Changed"
+
+        # Updating the base64 image data will kick off an async job
         expect(UpdateProfilePictureWorker.jobs.size).to eq 1
       end
     end
