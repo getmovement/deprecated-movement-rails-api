@@ -7,6 +7,9 @@ gem "rails-api"
 gem "active_model_serializers", github: "rails-api/active_model_serializers"
 # Use postgress as the database for Active Record
 gem "pg"
+
+gem "activerecord-postgis-adapter"
+
 # Use SCSS for stylesheets
 gem "sass-rails", "~> 5.0"
 # Use Uglifier as compressor for JavaScript assets
@@ -34,6 +37,7 @@ gem "aws-sdk"
 gem "sidekiq"
 
 gem "koala"
+gem "rgeo"
 
 # Use ActiveModel has_secure_password
 # gem "bcrypt", "~> 3.1.7"

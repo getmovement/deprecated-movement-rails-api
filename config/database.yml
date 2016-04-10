@@ -1,7 +1,7 @@
 test:
-  adapter: postgresql
+  adapter: postgis
   database: movement_test
 development:
-  adapter: postgresql
+  adapter: postgis
   database: movement_dev
   role: postgress
