@@ -1,0 +1,5 @@
+test:
+  adapter: postgis
+  database: circle_ruby_test
+  username: ubuntu
+  host: localhost

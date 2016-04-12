@@ -4,4 +4,4 @@ test:
 development:
   adapter: postgis
   database: movement_dev
-  role: postgress
+  role: postgres
