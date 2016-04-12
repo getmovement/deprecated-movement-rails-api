@@ -112,9 +112,9 @@ ActiveRecord::Schema.define(version: 20160419073347) do
   add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true, using: :btree
 
   create_table "united_states_subdivisions", force: :cascade do |t|
-    t.string   "name"
-    t.string   "postal_abbreviation"
-    t.string   "fips_code"
+    t.string   "name",                null: false
+    t.string   "postal_abbreviation", null: false
+    t.string   "fips_code",           null: false
     t.datetime "created_at",          null: false
     t.datetime "updated_at",          null: false
   end
