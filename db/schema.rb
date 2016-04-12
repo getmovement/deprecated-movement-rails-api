@@ -47,12 +47,12 @@ ActiveRecord::Schema.define(version: 20160419073347) do
   end
 
   create_table "congressional_districts", force: :cascade do |t|
-    t.integer  "united_states_subdivision_id"
-    t.integer  "number"
-    t.string   "state_postal_abbreviation"
-    t.string   "state_name"
-    t.integer  "congress_session"
-    t.geometry "polygon",                      limit: {:srid=>4326, :type=>"geometry"}
+    t.integer  "united_states_subdivision_id",                                          null: false
+    t.integer  "number",                                                                null: false
+    t.string   "state_postal_abbreviation",                                             null: false
+    t.string   "state_name",                                                            null: false
+    t.integer  "congress_session",                                                      null: false
+    t.geometry "polygon",                      limit: {:srid=>4326, :type=>"geometry"}, null: false
     t.datetime "created_at",                                                            null: false
     t.datetime "updated_at",                                                            null: false
   end
