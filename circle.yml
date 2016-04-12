@@ -2,7 +2,7 @@ database:
   override:
     # replace CircleCI's generated database.yml
     - cp config/database.ci.yml config/database.yml
-    - bundle exec rake db:create db:schema:load db:seeed
+    - bundle exec rake db:create db:schema:load db:seed
 deployment:
     production:
       branch: master
