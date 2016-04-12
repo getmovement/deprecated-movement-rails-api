@@ -1,9 +1,10 @@
 require "rails_helper"
+require "webmock/rspec"
 
 describe UpdateProfilePictureWorker do
   context "when the user has 'base_64_photo_data'" do
     let(:base_64_image) { Base64.encode64(open(file, &:read)) }
-    let(:file) { File.open("#{Rails.root}/spec/sample_data/default-avatar.png", "r") }
+    let(:file) { File.open("#{Rails.root}/spec/fixtures/default-avatar.png", "r") }
     let(:user) { create(:user, base_64_photo_data: base_64_image) }
 
     it "sets 'photo', then unsets 'base_64_photo_data'" do
@@ -23,20 +24,18 @@ describe UpdateProfilePictureWorker do
   end
 
   context "when the user is a facebook user" do
-    include FacebookHelpers
+    let(:user) { create(:user, facebook_id: "test_id", facebook_access_token: "test_token") }
+    let(:photo) { File.read("#{Rails.root}/spec/fixtures/default-avatar.png") }
+    let(:photo_url) { "https://example.com/photo.png" }
+    let(:facebook_service) { double("FacebookService", profile_photo: photo_url) }
 
-    let(:user) do
-      facebook_user = create_facebook_test_user
-      id = facebook_user["id"]
-      token = facebook_user["access_token"]
-      create(:user, facebook_id: id, facebook_access_token: token)
+    before do
+      allow(FacebookService).to receive(:from_user).and_return(facebook_service)
     end
 
-    it "adds a profile picture from facebook", vcr: { cassette_name: "facebook_profile_picture" } do
+    it "adds a profile picture from facebook" do
+      expect_any_instance_of(User).to receive(:photo=).with(URI.parse(photo_url))
       UpdateProfilePictureWorker.new.perform(user.id)
-
-      user.reload
-      expect(user.photo.path).to_not be_nil
     end
   end
 

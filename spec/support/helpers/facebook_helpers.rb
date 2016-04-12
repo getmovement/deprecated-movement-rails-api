@@ -1,10 +1,13 @@
 module FacebookHelpers
-  def create_facebook_test_user(params = "email,user_friends")
-    test_users = Koala::Facebook::TestUsers.new(
+  def create_facebook_test_users
+    Koala::Facebook::TestUsers.new(
       app_id: ENV["FACEBOOK_APP_ID"],
       secret: ENV["FACEBOOK_APP_SECRET"]
     )
+  end
 
+  def create_facebook_test_user(params = "email,user_friends")
+    test_users = create_facebook_test_users
     test_users.create(true, params)
   end
 

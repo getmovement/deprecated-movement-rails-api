@@ -48,7 +48,8 @@ class TokensController < Doorkeeper::TokensController
 
     def user_id_from_facebook_information
       facebook_access_token = params["password"]
-      facebook_id = FacebookService.from_token(facebook_access_token).facebook_id
+      facebook_service = FacebookService.from_token(facebook_access_token)
+      facebook_id = facebook_service.facebook_id
       User.find_by!(facebook_id: facebook_id).id
     end
 

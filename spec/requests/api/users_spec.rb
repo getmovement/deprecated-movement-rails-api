@@ -63,12 +63,6 @@ describe "Users API" do
     end
 
     context "when registering through Facebook" do
-      include FacebookHelpers
-      let(:facebook_user) { create_facebook_test_user }
-      let(:facebook_access_token) { create_facebook_access_token(facebook_user) }
-
-      let(:facebook_id) { facebook_user["id"] }
-
       let(:params) do
         {
           data: {
@@ -76,14 +70,14 @@ describe "Users API" do
             attributes: {
               email: "user@example.com",
               password: "password",
-              facebook_id: facebook_id,
-              facebook_access_token: facebook_access_token
+              facebook_id: "test_id",
+              facebook_access_token: "test_token"
             }
           }
         }
       end
 
-      it "creates a valid user", vcr: { cassette_name: "valid_facebook_registration_request" } do
+      it "creates a valid user" do
         post "#{host}/users", params
 
         expect(last_response.status).to eq 200
@@ -93,11 +87,12 @@ describe "Users API" do
         expect(json).to serialize_object(user).with(UserSerializer)
 
         expect(user.email).to eq "user@example.com"
-        expect(user.facebook_id).to eq facebook_id
-        expect(user.facebook_access_token).to eq facebook_access_token
+        expect(user.facebook_id).to eq "test_id"
+        expect(user.facebook_access_token).to eq "test_token"
 
-        # Updating the base64 image data will kick off an async job
+        # ensure all jobs are fired
         expect(UpdateProfilePictureWorker.jobs.size).to eq 1
+        expect(AddFacebookFriendsWorker.jobs.size).to eq 1
       end
     end
   end
@@ -168,7 +163,7 @@ describe "Users API" do
 
   context "PATCH /users/me" do
     let(:user) { create(:user, password: "password") }
-    let(:file) { File.open("#{Rails.root}/spec/sample_data/default-avatar.png", "r") }
+    let(:file) { File.open("#{Rails.root}/spec/fixtures/default-avatar.png", "r") }
     let(:base64_image) { Base64.encode64(open(file, &:read)) }
 
     let(:params) do

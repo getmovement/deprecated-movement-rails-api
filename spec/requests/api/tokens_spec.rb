@@ -37,7 +37,20 @@ describe "Tokens API" do
     end
 
     context "with a facebook_auth_code" do
-      context "when facebook user is missing", vcr: { cassette_name: "facebook_user_not_found" } do
+      before do
+        allow(FacebookService).to receive(:from_token).and_return(facebook_service)
+      end
+
+      context "when facebook user is missing" do
+        let(:facebook_service) { double("FacebookService") }
+
+        before do
+          koala_error = Koala::Facebook::AuthenticationError.new(
+            400, nil, "message" => "A message")
+          allow(facebook_service).
+            to receive(:facebook_id).and_raise(koala_error)
+        end
+
         it "fails with 400" do
           post "#{host}/oauth/token",
                grant_type: "password",
@@ -49,13 +62,11 @@ describe "Tokens API" do
         end
       end
 
-      context "when facebook user exists", vcr: { cassette_name: "facebook_user_found" } do
-        include FacebookHelpers
-        let(:facebook_user) { create_facebook_test_user }
-        let(:facebook_id) { facebook_user["id"] }
-        let(:access_token) { create_facebook_access_token(facebook_user) }
+      context "when facebook user exists" do
+        let(:facebook_id) { "test_id" }
+        let(:facebook_service) { double("FacebookService", facebook_id: facebook_id) }
 
-        let(:params) { { grant_type: "password", username: "facebook", password: access_token } }
+        let(:params) { { grant_type: "password", username: "facebook", password: "test_token" } }
 
         context "and there's a user with facebook_id in the database" do
           before do

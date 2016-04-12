@@ -15,6 +15,7 @@ module UserFacebookRegistration
 
       if user.update(facebook_create_params)
         UpdateProfilePictureWorker.perform_async(user.id)
+        AddFacebookFriendsWorker.perform_async(user.id)
         render json: user
       else
         render_validation_errors(facebook_user)
