@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: congressional_districts
+#
+#  id                           :integer          not null, primary key
+#  united_states_subdivision_id :integer          not null
+#  number                       :integer          not null
+#  state_postal_abbreviation    :string           not null
+#  state_name                   :string           not null
+#  congress_session             :integer          not null
+#  polygon                      :geometry({:srid= not null, geometry, 4326
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#
+
 class CongressionalDistrict < ActiveRecord::Base
   belongs_to :united_states_subdivision
 
