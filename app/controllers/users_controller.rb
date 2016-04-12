@@ -1,6 +1,7 @@
 class UsersController < APIController
   include UserPasswordManagement
-  prepend UserFacebookRegistration
+  include UserFacebookRegistration
+  include UserEmailRegistration
 
   before_action :doorkeeper_authorize!, only: [:update_authenticated_user]
 
@@ -12,15 +13,8 @@ class UsersController < APIController
   end
 
   def create
-    user = User.new(create_params)
-
-    authorize user
-
-    if user.save
-      render json: user, serializer: UserSerializer
-    else
-      render_validation_errors(user)
-    end
+    create_with_facebook if registering_through_facebook?
+    create_with_email unless registering_through_facebook?
   end
 
   def update_authenticated_user
@@ -29,13 +23,12 @@ class UsersController < APIController
 
   private
 
-    def create_params
-      record_attributes.permit(:email, :password, :first_name, :last_name)
-    end
-
-    def update_params
+    def base_params
       record_attributes.permit(:first_name, :last_name, :base_64_photo_data)
     end
+
+    alias create_params base_params
+    alias update_params base_params
 
     def update_and_render_result(user)
       user.assign_attributes update_params
@@ -44,7 +37,7 @@ class UsersController < APIController
         UpdateProfilePictureWorker.perform_async(user.id)
         render json: user
       else
-        render_validation_errors(user.errors)
+        render_validation_errors(user)
       end
     end
 end

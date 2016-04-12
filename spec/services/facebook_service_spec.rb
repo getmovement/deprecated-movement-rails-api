@@ -3,6 +3,10 @@ require "rails_helper"
 # NOTE: Some of the requests being recorded by VCR here are quite long
 # so re-recording them might take a long time, in order of minutes per
 # request for some requests
+#
+# The reason for the slowness is how Koala and the Facebook API handle test
+# user creation with a friend network. Requests need to be done one at a time,
+# so it takes long
 
 describe FacebookService do
   include FacebookHelpers

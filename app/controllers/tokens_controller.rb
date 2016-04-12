@@ -3,7 +3,7 @@ class TokensController < Doorkeeper::TokensController
 
   def create
     authenticate_with_facebook if signing_in_with_facebook?
-    authenticate_with_credentials if singing_in_regularly?
+    authenticate_with_credentials if signing_in_with_email?
   rescue Doorkeeper::Errors::DoorkeeperError,
          Doorkeeper::Errors::InvalidGrantReuse,
          Doorkeeper::OAuth::Error,
@@ -18,7 +18,7 @@ class TokensController < Doorkeeper::TokensController
       params[:username] == "facebook"
     end
 
-    def singing_in_regularly?
+    def signing_in_with_email?
       !signing_in_with_facebook?
     end
 

@@ -4,5 +4,5 @@ class UserRelationship < ActiveRecord::Base
 
   validates_presence_of :follower
   validates_presence_of :following
-  validates_uniqueness_of :follower_id, scope: :following_id
+  validates_uniqueness_of :follower, scope: :following
 end

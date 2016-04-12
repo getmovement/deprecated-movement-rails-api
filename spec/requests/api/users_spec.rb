@@ -20,15 +20,17 @@ describe "Users API" do
 
   context "POST /users" do
     context "when registering normally" do
+      let(:file) { File.open("#{Rails.root}/spec/fixtures/default-avatar.png", "r") }
+      let(:base64_image) { Base64.encode64(open(file, &:read)) }
+
       let(:valid_params) do
         {
           data: {
             type: "users",
             attributes: {
-              email: "new@example.com",
-              first_name: "Example",
-              last_name: "User",
-              password: "password"
+              email: "new@example.com", password: "password",
+              first_name: "Example", last_name: "User",
+              base_64_photo_data: base64_image
             }
           }
         }
@@ -37,10 +39,17 @@ describe "Users API" do
       it "creates a valid user" do
         post "#{host}/users", valid_params
         expect(last_response.status).to eq 200
-        expect(json).to serialize_object(User.last).with(UserSerializer)
 
-        expect(json.data.attributes["first-name"]).to eq "Example"
-        expect(json.data.attributes["last-name"]).to eq "User"
+        user = User.last
+        expect(user.first_name).to eq "Example"
+        expect(user.last_name).to eq "User"
+        expect(user.email).to eq "new@example.com"
+        expect(user.base_64_photo_data).to eq base64_image
+
+        expect(json).to serialize_object(user).with(UserSerializer)
+
+        # ensure all jobs are fired
+        expect(UpdateProfilePictureWorker.jobs.size).to eq 1
       end
     end
 

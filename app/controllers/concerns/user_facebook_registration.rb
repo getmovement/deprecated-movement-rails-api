@@ -3,11 +3,6 @@
 module UserFacebookRegistration
   extend ActiveSupport::Concern
 
-  def create
-    create_with_facebook if facebook_create?
-    super unless facebook_create?
-  end
-
   private
 
     def create_with_facebook
@@ -18,7 +13,7 @@ module UserFacebookRegistration
         AddFacebookFriendsWorker.perform_async(user.id)
         render json: user
       else
-        render_validation_errors(facebook_user)
+        render_validation_errors(user)
       end
     end
 
@@ -30,11 +25,12 @@ module UserFacebookRegistration
     end
 
     def facebook_create_params
-      facebook_params = record_attributes.permit(:facebook_id, :facebook_access_token)
+      facebook_params = record_attributes.permit(
+        :email, :password, :facebook_id, :facebook_access_token)
       create_params.merge(facebook_params)
     end
 
-    def facebook_create?
+    def registering_through_facebook?
       facebook_create_params[:facebook_id].present? &&
         facebook_create_params[:facebook_access_token].present?
     end

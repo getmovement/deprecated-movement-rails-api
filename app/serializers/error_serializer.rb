@@ -12,8 +12,19 @@ class ErrorSerializer
 
   private
 
+    # Figures out the serialization method name from the error class name
+    # ModuleName::ClassName -> :serialize_module_name_class_name
+    #
+    # The main #serialize method then sends this method name to the class instance
+    # If the serializer doesn't support serializing that error class, a "method_missing"
+    # error will be raised
     def serialization_method
-      error.class.to_s.underscore.tr("/", "_").prepend("serialize_").to_sym
+      # ModuleName::ClassName -> "ModuleName/ClassName"
+      full_error_class_name = error.class.to_s
+      # "ModuleName/ClassName" -> "module_name_class_name"
+      underscored_full_error_class_name = full_error_class_name.underscore.tr("/", "_")
+      # "module_name_class_name" -> :serialize_module_name_class_name
+      "serialize_#{underscored_full_error_class_name}".to_sym
     end
 
     def serialize_active_record_record_not_found

@@ -11,8 +11,8 @@ class AddFacebookFriendsWorker
     facebook_friend_ids.each do |facebook_id|
       friend = User.find_by(facebook_id: facebook_id)
       if friend
-        friend.follow(user) unless friend.following?(user)
-        user.follow(friend) unless user.following?(friend)
+        friend.follow(user)
+        user.follow(friend)
       end
     end
   end
