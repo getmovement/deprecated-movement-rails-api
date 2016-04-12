@@ -81,6 +81,7 @@ GEM
     connection_pool (2.2.0)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
+    dbf (3.0.5)
     debug_inspector (0.0.2)
     diff-lcs (1.2.5)
     doorkeeper (3.1.0)
@@ -200,6 +201,9 @@ GEM
     rgeo-activerecord (4.0.5)
       activerecord (~> 4.2)
       rgeo (~> 0.3)
+    rgeo-shapefile (0.4.1)
+      dbf (~> 3.0)
+      rgeo (~> 0.3)
     rspec (3.4.0)
       rspec-core (~> 3.4.0)
       rspec-expectations (~> 3.4.0)
@@ -297,6 +301,7 @@ DEPENDENCIES
   rails (= 4.2.5)
   rails-api
   rgeo
+  rgeo-shapefile
   rspec-rails
   rspec-sidekiq
   sass-rails (~> 5.0)

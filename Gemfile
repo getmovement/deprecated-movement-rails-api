@@ -38,6 +38,7 @@ gem "sidekiq"
 
 gem "koala"
 gem "rgeo"
+gem "rgeo-shapefile"
 
 # Use ActiveModel has_secure_password
 # gem "bcrypt", "~> 3.1.7"
