@@ -18,7 +18,7 @@ describe "Users API" do
     end
   end
 
-  context "POST /users" do
+  describe "POST /users" do
     context "when registering normally" do
       let(:file) { File.open("#{Rails.root}/spec/fixtures/default-avatar.png", "r") }
       let(:base64_image) { Base64.encode64(open(file, &:read)) }
@@ -106,7 +106,7 @@ describe "Users API" do
     end
   end
 
-  context "passwords" do
+  describe "passwords" do
     let(:user) { create(:user, password: "test_password") }
     let(:valid_forgot_params) { { data: { type: "users", attributes: { email: user.email } } } }
     let(:invalid_forgot_params) { { data: { type: "users", attributes: { email: "a@b.c" } } } }
@@ -129,7 +129,7 @@ describe "Users API" do
       }
     end
 
-    context "POST /users/forgot_password" do
+    describe "POST /users/forgot_password" do
       it "returns the user when the email is found" do
         post "#{host}/users/forgot_password", valid_forgot_params
 
@@ -147,7 +147,7 @@ describe "Users API" do
       end
     end
 
-    context "POST /users/reset_password" do
+    describe "POST /users/reset_password" do
       it "resets the password when the authentication token is valid" do
         post "#{host}/users/forgot_password", valid_forgot_params
         post "#{host}/users/reset_password", valid_reset_params
@@ -155,7 +155,7 @@ describe "Users API" do
         expect(last_response.status).to eq 200
 
         token = authenticate(email: user.email, password: "new")
-        expect(token).to_not be_nil
+        expect(token).not_to be_nil
       end
 
       it "doesn't reset the password when the authentication token is not valid" do
@@ -170,7 +170,7 @@ describe "Users API" do
     end
   end
 
-  context "PATCH /users/me" do
+  describe "PATCH /users/me" do
     let(:user) { create(:user, password: "password") }
     let(:file) { File.open("#{Rails.root}/spec/fixtures/default-avatar.png", "r") }
     let(:base64_image) { Base64.encode64(open(file, &:read)) }

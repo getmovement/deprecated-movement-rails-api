@@ -14,5 +14,8 @@ Rails.application.routes.draw do
       post :forgot_password, on: :collection
       post :reset_password, on: :collection
     end
+
+    resources :campaign_volunteers, only: [:index, :create]
+    resources :campaigns, only: [:show]
   end
 end

@@ -29,6 +29,12 @@ RSpec.describe User, type: :model do
 
     it { should have_many(:following).through(:active_relationships).source(:following) }
     it { should have_many(:followers).through(:passive_relationships).source(:follower) }
+
+    # rubocop:disable LineLength
+    it { should have_many(:campaign_volunteerships).class_name("CampaignVolunteer").with_foreign_key(:volunteer_id) }
+    # rubocop:enable LineLength
+
+    it { should have_many(:campaigns).through(:campaign_volunteerships) }
   end
 
   describe "validations" do

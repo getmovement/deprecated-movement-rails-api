@@ -1,23 +1,23 @@
 RSpec::Matchers.define :be_a_valid_json_api_error do
   def hash_has_nonempty_error_key?
-    return false unless @hash.has_key? :errors
+    return false unless @hash.key? :errors
     return false unless @hash[:errors].class == Array
-    return false unless @hash[:errors].length > 0
-    return true
+    return false if @hash[:errors].empty?
+    true
   end
 
   def all_errors_in_hash_are_valid?
-    return false unless @hash[:errors].all? { |error| is_valid? error }
-    return true
+    return false unless @hash[:errors].all? { |error| valid? error }
+    true
   end
 
-  def is_valid?(error)
+  def valid?(error)
     error = error.with_indifferent_access
-    return false unless error.has_key? :id
-    return false unless error.has_key? :title
-    return false unless error.has_key? :detail
-    return false unless error.has_key? :status
-    return true
+    return false unless error.key? :id
+    return false unless error.key? :title
+    return false unless error.key? :detail
+    return false unless error.key? :status
+    true
   end
 
   def id_is_correct
@@ -26,7 +26,7 @@ RSpec::Matchers.define :be_a_valid_json_api_error do
 
   match do |hash|
     @hash = hash.with_indifferent_access
-    result = hash_has_nonempty_error_key? and all_errors_in_hash_are_valid?
+    result = hash_has_nonempty_error_key? && all_errors_in_hash_are_valid?
     result &&= id_is_correct unless @expected_id.nil?
     result
   end
@@ -38,35 +38,35 @@ end
 
 RSpec::Matchers.define :be_a_valid_json_api_validation_error do
   def hash_has_nonempty_error_key?
-    return false unless @hash.has_key? :errors
+    return false unless @hash.key? :errors
     return false unless @hash[:errors].class == Array
-    return false unless @hash[:errors].length > 0
-    return true
+    return false if @hash[:errors].empty?
+    true
   end
 
   def all_errors_in_hash_are_validation_errors?
-    return false unless @hash[:errors].all? { |error| is_validation_error? error }
-    return true
+    return false unless @hash[:errors].all? { |error| validation_error? error }
+    true
   end
 
-  def is_validation_error?(error)
+  def validation_error?(error)
     error = error.with_indifferent_access
     return false unless error[:id] == "VALIDATION_ERROR"
-    return false unless error.has_key? :source
-    return false unless error[:source].has_key? :pointer
-    return false unless error.has_key? :detail
+    return false unless error.key? :source
+    return false unless error[:source].key? :pointer
+    return false unless error.key? :detail
     return false unless error[:status] == 422
-    return true
+    true
   end
 
-  def hash_contains_error_with_message? message
+  def hash_contains_error_with_message?(message)
     errors = @hash[:errors]
     errors.any? do |error_hash|
       error_message_for(error_hash) == message
     end
   end
 
-  def hash_contains_errors_with_messages? messages
+  def hash_contains_errors_with_messages?(messages)
     errors = @hash[:errors]
     messages.each do |message|
       error = errors.detect do |error_hash|
@@ -75,7 +75,8 @@ RSpec::Matchers.define :be_a_valid_json_api_validation_error do
 
       return false unless error.present?
     end
-    return true
+
+    true
   end
 
   def error_message_for(error_hash)
@@ -84,10 +85,9 @@ RSpec::Matchers.define :be_a_valid_json_api_validation_error do
     "#{field} #{detail}"
   end
 
-
   match do |hash|
     @hash = hash.with_indifferent_access
-    result = hash_has_nonempty_error_key? and all_errors_in_hash_are_validation_errors?
+    result = hash_has_nonempty_error_key? && all_errors_in_hash_are_validation_errors?
     result &&= hash_contains_error_with_message? @message unless @message.nil?
     result &&= hash_contains_errors_with_messages? @messages unless @messages.nil?
     result
@@ -102,20 +102,20 @@ RSpec::Matchers.define :be_a_valid_json_api_validation_error do
   end
 end
 
-
-RSpec::Matchers.define :contain_an_error_of_type do  |expected_type|
-  def there_is_an_error_with_id expected
-    return @errors.any? { |e| e[:id] == expected }
+RSpec::Matchers.define :contain_an_error_of_type do |expected_type|
+  def there_is_an_error_with_id(expected)
+    @errors.any? { |e| e[:id] == expected }
   end
 
-  def there_is_an_error_with_message expected
-    return @errors.any? { |e| e[:detail] == expected }
+  def there_is_an_error_with_message(expected)
+    @errors.any? { |e| e[:detail] == expected }
   end
 
   match do |hash|
     @errors = hash.with_indifferent_access[:errors].map(&:with_indifferent_access)
     result = there_is_an_error_with_id expected_type
     result &&= there_is_an_error_with_message @expected_message unless @expected_message.nil?
+    result
   end
 
   chain :with_message do |expected_message|
