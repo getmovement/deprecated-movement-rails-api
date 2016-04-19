@@ -6,6 +6,8 @@ Style/IndentationConsistency:
   EnforcedStyle: rails
 Style/ConditionalAssignment:
   EnforcedStyle: assign_inside_condition
+Style/DotPosition:
+  EnforcedStyle: trailing
 Metrics/LineLength:
   Max: 100
 Metrics/CyclomaticComplexity:

@@ -65,4 +65,6 @@ group :test do
   gem "faker"
   gem "shoulda-matchers"
   gem "rspec-sidekiq"
+  gem "vcr"
+  gem "webmock"
 end
