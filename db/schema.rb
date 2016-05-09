@@ -13,6 +13,7 @@
 
 ActiveRecord::Schema.define(version: 20160419073347) do
 
+
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -68,18 +69,31 @@ ActiveRecord::Schema.define(version: 20160419073347) do
 
   add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true, using: :btree
 
+  create_table "user_relationships", force: :cascade do |t|
+    t.integer  "follower_id",  null: false
+    t.integer  "following_id", null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
+  add_index "user_relationships", ["follower_id", "following_id"], name: "index_user_relationships_on_follower_id_and_following_id", unique: true, using: :btree
+  add_index "user_relationships", ["follower_id"], name: "index_user_relationships_on_follower_id", using: :btree
+  add_index "user_relationships", ["following_id"], name: "index_user_relationships_on_following_id", using: :btree
+
   create_table "users", force: :cascade do |t|
-    t.string   "email",                          null: false
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
-    t.string   "encrypted_password", limit: 128
-    t.string   "confirmation_token", limit: 128
-    t.string   "remember_token",     limit: 128
+    t.string   "email",                             null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+    t.string   "encrypted_password",    limit: 128
+    t.string   "confirmation_token",    limit: 128
+    t.string   "remember_token",        limit: 128
     t.string   "base_64_photo_data"
     t.string   "photo_file_name"
     t.string   "photo_content_type"
     t.integer  "photo_file_size"
     t.datetime "photo_updated_at"
+    t.string   "facebook_id"
+    t.string   "facebook_access_token"
     t.string   "first_name"
     t.string   "last_name"
   end

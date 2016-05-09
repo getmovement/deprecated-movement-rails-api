@@ -10,7 +10,7 @@ module MovementApi
       let(:base64_string) { File.open(filename, &:read) }
 
       context "when base64 string has data string" do
-        let(:filename) { "#{Rails.root}/spec/sample_data/base64_images/jpeg.txt" }
+        let(:filename) { "#{Rails.root}/spec/fixtures/base64_images/jpeg.txt" }
 
         it "sets the right content type and filename" do
           expect(result.content_type).to eq "image/png"
@@ -24,7 +24,7 @@ module MovementApi
       end
 
       context "when base64 string has no data string" do
-        let(:filename) { "#{Rails.root}/spec/sample_data/base64_images/jpeg_without_data_string.txt" }
+        let(:filename) { "#{Rails.root}/spec/fixtures/base64_images/jpeg_without_data_string.txt" }
 
         it "sets the right content type and filename" do
           expect(result.content_type).to eq "image/png"

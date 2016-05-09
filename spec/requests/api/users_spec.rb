@@ -18,52 +18,96 @@ describe "Users API" do
     end
   end
 
-  context 'POST /users' do
-    let(:valid_params) do
-      {
-        data: {
-          type: "users",
-          attributes: {
-            email: "new@example.com",
-            first_name: "Example",
-            last_name: "User",
-            password: "password"
+  context "POST /users" do
+    context "when registering normally" do
+      let(:file) { File.open("#{Rails.root}/spec/fixtures/default-avatar.png", "r") }
+      let(:base64_image) { Base64.encode64(open(file, &:read)) }
+
+      let(:valid_params) do
+        {
+          data: {
+            type: "users",
+            attributes: {
+              email: "new@example.com", password: "password",
+              first_name: "Example", last_name: "User",
+              base_64_photo_data: base64_image
+            }
           }
         }
-      }
+      end
+
+      it "creates a valid user" do
+        post "#{host}/users", valid_params
+        expect(last_response.status).to eq 200
+
+        user = User.last
+        expect(user.first_name).to eq "Example"
+        expect(user.last_name).to eq "User"
+        expect(user.email).to eq "new@example.com"
+        expect(user.base_64_photo_data).to eq base64_image
+
+        expect(json).to serialize_object(user).with(UserSerializer)
+
+        # ensure all jobs are fired
+        expect(UpdateProfilePictureWorker.jobs.size).to eq 1
+      end
     end
 
-    let(:invalid_params) do
-      {
-        data: {
-          type: "users",
-          attributes: { }
+    context "with invalid parameters" do
+      let(:invalid_params) do
+        {
+          data: { type: "users", attributes: {} }
         }
-      }
+      end
+
+      it "fails with a validation error" do
+        post "#{host}/users", invalid_params
+        expect(last_response.status).to eq 422
+        expect(json).to be_a_valid_json_api_validation_error.with_messages(
+          [
+            "email can't be blank",
+            "password can't be blank"
+          ])
+      end
     end
 
-    it "creates a valid user when a params are valid" do
-      post "#{host}/users", valid_params
-      expect(last_response.status).to eq 200
-      expect(json).to serialize_object(User.last).with(UserSerializer)
+    context "when registering through Facebook" do
+      let(:params) do
+        {
+          data: {
+            type: "users",
+            attributes: {
+              email: "user@example.com",
+              password: "password",
+              facebook_id: "test_id",
+              facebook_access_token: "test_token"
+            }
+          }
+        }
+      end
 
-      # Check the attributes
-      expect(json.data.attributes["first-name"]).to eq "Example"
-      expect(json.data.attributes["last-name"]).to eq "User"
-    end
+      it "creates a valid user" do
+        post "#{host}/users", params
 
-    it "fails with a validation error when params are invalid" do
-      post "#{host}/users", invalid_params
-      expect(last_response.status).to eq 422
-      expect(json).to be_a_valid_json_api_validation_error.with_messages([
-        "email can't be blank",
-        "password can't be blank"
-      ])
+        expect(last_response.status).to eq 200
+
+        user = User.last
+
+        expect(json).to serialize_object(user).with(UserSerializer)
+
+        expect(user.email).to eq "user@example.com"
+        expect(user.facebook_id).to eq "test_id"
+        expect(user.facebook_access_token).to eq "test_token"
+
+        # ensure all jobs are fired
+        expect(UpdateProfilePictureWorker.jobs.size).to eq 1
+        expect(AddFacebookFriendsWorker.jobs.size).to eq 1
+      end
     end
   end
 
   context "passwords" do
-    let(:user) { create(:user, password: 'test_password') }
+    let(:user) { create(:user, password: "test_password") }
     let(:valid_forgot_params) { { data: { type: "users", attributes: { email: user.email } } } }
     let(:invalid_forgot_params) { { data: { type: "users", attributes: { email: "a@b.c" } } } }
 
@@ -97,7 +141,9 @@ describe "Users API" do
         post "#{host}/users/forgot_password", invalid_forgot_params
 
         expect(last_response.status).to eq 422
-        expect(json).to be_a_valid_json_api_validation_error.with_message "email doesn't exist in the database"
+        expect(json).
+          to be_a_valid_json_api_validation_error.
+          with_message "email doesn't exist in the database"
       end
     end
 
@@ -117,14 +163,16 @@ describe "Users API" do
         post "#{host}/users/reset_password", invalid_reset_params
 
         expect(last_response.status).to eq 422
-        expect(json).to be_a_valid_json_api_validation_error.with_message "password could not be reset"
+        expect(json).
+          to be_a_valid_json_api_validation_error.
+          with_message "password could not be reset"
       end
     end
   end
 
   context "PATCH /users/me" do
     let(:user) { create(:user, password: "password") }
-    let(:file) { File.open("#{Rails.root}/spec/sample_data/default-avatar.png", "r") }
+    let(:file) { File.open("#{Rails.root}/spec/fixtures/default-avatar.png", "r") }
     let(:base64_image) { Base64.encode64(open(file, &:read)) }
 
     let(:params) do

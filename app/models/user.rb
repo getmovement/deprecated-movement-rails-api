@@ -3,13 +3,17 @@ class User < ActiveRecord::Base
 
   ASSET_HOST_FOR_DEFAULT_PHOTO = "https://d3pgew4wbk2vb1.cloudfront.net/icons".freeze
 
+  has_many :active_relationships,
+           class_name: "UserRelationship", foreign_key: "follower_id", dependent: :destroy
+  has_many :passive_relationships,
+           class_name: "UserRelationship", foreign_key: "following_id", dependent: :destroy
+  has_many :following, through: :active_relationships, source: :following
+  has_many :followers, through: :passive_relationships, source: :follower
+
   validates :email, presence: true
 
   has_attached_file :photo,
-                    styles: {
-                      large: "500x500#",
-                      thumb: "100x100#"
-                    },
+                    styles: { large: "500x500#", thumb: "100x100#" },
                     path: "users/:id/:style.:extension",
                     default_url: ASSET_HOST_FOR_DEFAULT_PHOTO + "/user_default_:style.png"
 
@@ -17,4 +21,16 @@ class User < ActiveRecord::Base
                                     content_type: %r{^image\/(png|gif|jpeg)}
 
   validates_attachment_size :photo, less_than: 10.megabytes
+
+  def follow(other_user)
+    active_relationships.create(following_id: other_user.id)
+  end
+
+  def unfollow(other_user)
+    active_relationships.find_by(following_id: other_user.id).destroy
+  end
+
+  def following?(other_user)
+    following.include?(other_user)
+  end
 end
