@@ -12,8 +12,6 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define(version: 20160419073347) do
-
-
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -28,6 +26,23 @@ ActiveRecord::Schema.define(version: 20160419073347) do
 
   add_index "devices", ["token"], name: "index_devices_on_token", unique: true, using: :btree
   add_index "devices", ["user_id"], name: "index_devices_on_user_id", using: :btree
+
+  create_table "campaign_volunteers", force: :cascade do |t|
+    t.integer  "volunteer_id", null: false
+    t.integer  "campaign_id",  null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
+  add_index "campaign_volunteers", ["campaign_id"], name: "index_campaign_volunteers_on_campaign_id", using: :btree
+  add_index "campaign_volunteers", ["volunteer_id"], name: "index_campaign_volunteers_on_volunteer_id", using: :btree
+
+  create_table "campaigns", force: :cascade do |t|
+    t.string   "title",       null: false
+    t.text     "description", null: false
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
 
   create_table "oauth_access_grants", force: :cascade do |t|
     t.integer  "resource_owner_id", null: false
@@ -102,4 +117,6 @@ ActiveRecord::Schema.define(version: 20160419073347) do
   add_index "users", ["remember_token"], name: "index_users_on_remember_token", using: :btree
 
   add_foreign_key "devices", "users"
+  add_foreign_key "campaign_volunteers", "campaigns"
+  add_foreign_key "campaign_volunteers", "users", column: "volunteer_id"
 end

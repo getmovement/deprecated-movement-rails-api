@@ -1,7 +1,6 @@
 require "rails_helper"
 
 describe UserSerializer, type: :serializer do
-
   context "individual resource representation" do
     let(:resource) { create(:user) }
     let(:serializer) { UserSerializer.new(resource) }
@@ -9,7 +8,7 @@ describe UserSerializer, type: :serializer do
 
     context "root" do
       subject do
-        JSON.parse(serialization.to_json)['data']
+        JSON.parse(serialization.to_json)["data"]
       end
 
       it "has an attributes object" do
@@ -31,7 +30,7 @@ describe UserSerializer, type: :serializer do
 
     context "attributes" do
       subject do
-        JSON.parse(serialization.to_json)['data']['attributes']
+        JSON.parse(serialization.to_json)["data"]["attributes"]
       end
 
       it "has an 'email'" do

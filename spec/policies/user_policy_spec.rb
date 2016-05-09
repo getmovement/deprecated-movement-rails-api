@@ -1,17 +1,10 @@
 require "rails_helper"
 
 describe UserPolicy do
-
   subject { described_class }
 
   let(:user_1) { create(:user) }
   let(:user_2) { create(:user) }
-
-  permissions :show? do
-    it "is permited for anyone" do
-      expect(subject).to permit(nil, User)
-    end
-  end
 
   permissions :show? do
     it "is permited for anyone" do

@@ -3,10 +3,14 @@ class User < ActiveRecord::Base
 
   ASSET_HOST_FOR_DEFAULT_PHOTO = "https://d3pgew4wbk2vb1.cloudfront.net/icons".freeze
 
+  has_many :campaign_volunteerships, class_name: "CampaignVolunteer", foreign_key: :volunteer_id
+  has_many :campaigns, through: :campaign_volunteerships
+
   has_many :active_relationships,
            class_name: "UserRelationship", foreign_key: "follower_id", dependent: :destroy
   has_many :passive_relationships,
            class_name: "UserRelationship", foreign_key: "following_id", dependent: :destroy
+
   has_many :following, through: :active_relationships, source: :following
   has_many :followers, through: :passive_relationships, source: :follower
 

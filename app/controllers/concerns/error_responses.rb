@@ -8,6 +8,7 @@ module ErrorResponses
 
   included do
     rescue_from ActiveRecord::RecordNotFound, with: :render_error
+    rescue_from ActionController::ParameterMissing, with: :render_error
   end
 
   def render_validation_errors(model)

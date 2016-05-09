@@ -62,4 +62,13 @@ class ErrorSerializer
         status: error.http_status
       }
     end
+
+    def serialize_action_controller_parameter_missing
+      {
+        id: "PARAMETER_MISSING",
+        title: "Parameter is missing",
+        detail: error.message,
+        status: 400
+      }
+    end
 end

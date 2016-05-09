@@ -49,7 +49,7 @@ RSpec::Matchers.define :serialize_object do |object|
   end
 
   def failure_message
-    "expected json to be a result of serializing #{@object.to_s} with #{@serializer_klass}"
+    "expected json to be a result of serializing #{@object} with #{@serializer_klass}"
   end
 
   diffable
@@ -85,14 +85,16 @@ RSpec::Matchers.define :serialize_collection do |collection|
     @actual_json = cleanup(actual_json)
     @expected_json = serialize(collection)
 
-    content_is_ok and remainder_is_ok
+    content_ok? && remainder_ok?
   end
 
   def serialize(collection)
     options = {}
-    options = options.merge(pagination_options_for collection) if is_paginated?(collection)
-    serializer =  ActiveModelSerializers::CollectionSerializer.new collection, serializer: @serializer_klass
-    serialization = ActiveModelSerializers::Adapter.create(serializer, include: includes, meta: meta)
+    options = options.merge(pagination_options) if paginated?(collection)
+    serializer =  ActiveModel::Serializer::CollectionSerializer.new(
+      collection, serializer: @serializer_klass)
+    serialization = ActiveModelSerializers::Adapter.create(
+      serializer, include: includes, meta: meta)
 
     expected_json = serialization.as_json(options)
     expected_json = cleanup(expected_json)
@@ -111,9 +113,7 @@ RSpec::Matchers.define :serialize_collection do |collection|
     @includes ||= []
   end
 
-  def meta
-    @meta
-  end
+  attr_reader :meta
 
   def host
     @host || ""
@@ -134,13 +134,13 @@ RSpec::Matchers.define :serialize_collection do |collection|
     json
   end
 
-  def is_paginated?(collection)
+  def paginated?(collection)
     collection.respond_to?(:current_page) &&
-    collection.respond_to?(:total_pages) &&
-    collection.respond_to?(:size)
+      collection.respond_to?(:total_pages) &&
+      collection.respond_to?(:size)
   end
 
-  def pagination_options_for(collection)
+  def pagination_options
     request = double(original_url: host, query_parameters: {})
 
     serialization_context = ActiveModelSerializers::SerializationContext.new(request)
@@ -148,17 +148,16 @@ RSpec::Matchers.define :serialize_collection do |collection|
     { serialization_context: serialization_context }
   end
 
-
   def arrays_have_same_elements(a, b)
     a.to_set == b.to_set
   end
 
-  def content_is_ok(expected_json, actual_json)
+  def content_ok?
     arrays_have_same_elements(expected[:data], actual[:data])
   end
 
   # ensures parts of the json objects other than the :data hash are also identical
-  def remainder_is_ok(expected_json, actual_json)
+  def remainder_ok?
     expected.delete(:data)
     actual.delete(:data)
     expected == actual
@@ -173,7 +172,7 @@ RSpec::Matchers.define :serialize_collection do |collection|
   end
 
   def failure_message
-    "expected json to be a result of serializing #{@collection.to_s} with #{@serializer_klass}"
+    "expected json to be a result of serializing #{@collection} with #{@serializer_klass}"
   end
 
   diffable
