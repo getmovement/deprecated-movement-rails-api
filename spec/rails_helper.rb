@@ -11,6 +11,8 @@ require "paperclip/matchers"
 require "sidekiq/testing"
 require "clearance/rspec"
 
+require "webmock/rspec"
+
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 # Checks for pending migration and applies them before tests are run.
@@ -59,4 +61,6 @@ RSpec.configure do |config|
   end
 
   config.include Paperclip::Shoulda::Matchers
+
+  config.include WebMock::API
 end
