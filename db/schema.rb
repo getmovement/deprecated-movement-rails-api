@@ -15,6 +15,7 @@ ActiveRecord::Schema.define(version: 20160419073347) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "postgis"
 
   create_table "addresses", force: :cascade do |t|
     t.float    "latitude",           null: false
@@ -44,6 +45,19 @@ ActiveRecord::Schema.define(version: 20160419073347) do
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
   end
+
+  create_table "congressional_districts", force: :cascade do |t|
+    t.integer  "united_states_subdivision_id",                                          null: false
+    t.integer  "number",                                                                null: false
+    t.string   "state_postal_abbreviation",                                             null: false
+    t.string   "state_name",                                                            null: false
+    t.integer  "congress_session",                                                      null: false
+    t.geometry "polygon",                      limit: {:srid=>4326, :type=>"geometry"}, null: false
+    t.datetime "created_at",                                                            null: false
+    t.datetime "updated_at",                                                            null: false
+  end
+
+  add_index "congressional_districts", ["polygon"], name: "index_congressional_districts_on_polygon", using: :gist
 
   create_table "devices", force: :cascade do |t|
     t.integer  "user_id"
@@ -96,6 +110,17 @@ ActiveRecord::Schema.define(version: 20160419073347) do
   end
 
   add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true, using: :btree
+
+  create_table "united_states_subdivisions", force: :cascade do |t|
+    t.string   "name",                null: false
+    t.string   "postal_abbreviation", null: false
+    t.string   "fips_code",           null: false
+    t.datetime "created_at",          null: false
+    t.datetime "updated_at",          null: false
+  end
+
+  add_index "united_states_subdivisions", ["fips_code"], name: "index_united_states_subdivisions_on_fips_code", using: :btree
+  add_index "united_states_subdivisions", ["postal_abbreviation"], name: "index_united_states_subdivisions_on_postal_abbreviation", using: :btree
 
   create_table "user_relationships", force: :cascade do |t|
     t.integer  "follower_id",  null: false

@@ -7,6 +7,9 @@ gem "rails-api"
 gem "active_model_serializers", github: "rails-api/active_model_serializers"
 # Use postgress as the database for Active Record
 gem "pg"
+
+gem "activerecord-postgis-adapter"
+
 # Use SCSS for stylesheets
 gem "sass-rails", "~> 5.0"
 # Use Uglifier as compressor for JavaScript assets
@@ -23,6 +26,8 @@ gem "jbuilder", "~> 2.0"
 # bundle exec rake doc:rails generates the API under doc/api.
 gem "sdoc", "~> 0.4.0", group: :doc
 
+gem "annotate"
+
 gem "mailchimp-api", require: "mailchimp"
 
 gem "doorkeeper"
@@ -34,6 +39,9 @@ gem "aws-sdk"
 gem "sidekiq"
 
 gem "koala"
+gem "rgeo"
+gem "rgeo-shapefile"
+gem "smarter_csv"
 
 # Use ActiveModel has_secure_password
 # gem "bcrypt", "~> 3.1.7"

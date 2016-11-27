@@ -1,3 +1,23 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id                 :integer          not null, primary key
+#  email              :string           not null
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  encrypted_password :string(128)
+#  confirmation_token :string(128)
+#  remember_token     :string(128)
+#  base_64_photo_data :string
+#  photo_file_name    :string
+#  photo_content_type :string
+#  photo_file_size    :integer
+#  photo_updated_at   :datetime
+#  first_name         :string
+#  last_name          :string
+#
+
 class User < ActiveRecord::Base
   include Clearance::User
 
